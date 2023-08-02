@@ -15,7 +15,15 @@ class TaskController extends Controller
      */
     public function listAction()
     {
-        return $this->render('task/list.html.twig', ['tasks' => $this->getDoctrine()->getRepository('AppBundle:Task')->findAll()]);
+        return $this->render('task/list.html.twig', ['tasks' => $this->getDoctrine()->getRepository('AppBundle:Task')->findByIsDone(false)]);
+    }
+
+    /**
+     * @Route("/tasks/done", name="done_task_list")
+     */
+    public function listDoneAction()
+    {
+        return $this->render('task/done.html.twig', ['tasks' => $this->getDoctrine()->getRepository('AppBundle:Task')->findByIsDone(true)]);
     }
 
     /**
@@ -85,7 +93,26 @@ class TaskController extends Controller
      */
     public function deleteTaskAction(Task $task)
     {
-        if ($task->getUser() == $this->getUser()) {
+
+        if ($task->getUser() === null){
+            
+            if ($this->isGranted("ROLE_ADMIN")){
+
+                $em = $this->getDoctrine()->getManager();
+                $em->remove($task);
+                $em->flush();
+
+                $this->addFlash('success', 'La tâche a bien été supprimée.');
+                return $this->redirectToRoute('task_list');
+
+            } else {
+
+                $this->addFlash('notice', 'Cette tâche est anonyme, vous devez être administrateur pour la supprimer');
+                return $this->redirectToRoute('task_list');
+
+            }
+
+        } else if ($task->getUser() == $this->getUser()) {
             
             $em = $this->getDoctrine()->getManager();
             $em->remove($task);
@@ -94,10 +121,11 @@ class TaskController extends Controller
             $this->addFlash('success', 'La tâche a bien été supprimée.');
             return $this->redirectToRoute('task_list');
 
+        } else {
+
+            $this->addFlash('notice', 'Cette tâche ne vous appartient pas, vous devez être administrateur pour la supprimer');
+            return $this->redirectToRoute('task_list');
+
         }
-
-        $this->addFlash('notice', 'Cette tâche ne vous appartient pas, vous devez être administrateur pour la supprimer');
-        return $this->redirectToRoute('task_list');
-
     }
 }
