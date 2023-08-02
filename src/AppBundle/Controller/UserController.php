@@ -15,7 +15,15 @@ class UserController extends Controller
      */
     public function listAction()
     {
-        return $this->render('user/list.html.twig', ['users' => $this->getDoctrine()->getRepository('AppBundle:User')->findAll()]);
+        if ($this->isGranted("ROLE_ADMIN")){
+
+            return $this->render('user/list.html.twig', ['users' => $this->getDoctrine()->getRepository('AppBundle:User')->findAll()]);
+        
+        } else {
+
+            header("location: http://127.0.0.1:8000");
+            die;
+        }
     }
 
     /**
@@ -50,21 +58,29 @@ class UserController extends Controller
      */
     public function editAction(User $user, Request $request)
     {
-        $form = $this->createForm(UserType::class, $user);
+        if ($this->isGranted("ROLE_ADMIN")){
 
-        $form->handleRequest($request);
+            $form = $this->createForm(UserType::class, $user);
 
-        if ($form->isValid()) {
-            $password = $this->get('security.password_encoder')->encodePassword($user, $user->getPassword());
-            $user->setPassword($password);
+            $form->handleRequest($request);
 
-            $this->getDoctrine()->getManager()->flush();
+            if ($form->isValid()) {
+                $password = $this->get('security.password_encoder')->encodePassword($user, $user->getPassword());
+                $user->setPassword($password);
 
-            $this->addFlash('success', "L'utilisateur a bien été modifié");
+                $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('user_list');
+                $this->addFlash('success', "L'utilisateur a bien été modifié");
+
+                return $this->redirectToRoute('user_list');
+            }
+
+            return $this->render('user/edit.html.twig', ['form' => $form->createView(), 'user' => $user]);
+        
+        } else {
+
+            header("location: http://127.0.0.1:8000");
+            die;
         }
-
-        return $this->render('user/edit.html.twig', ['form' => $form->createView(), 'user' => $user]);
     }
 }

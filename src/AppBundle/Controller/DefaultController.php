@@ -12,6 +12,7 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {
-        return $this->render('default/index.html.twig');
+        $isAdmin = $this->isGranted("ROLE_ADMIN");
+        return $this->render('default/index.html.twig', ['isAdmin' => $isAdmin]);
     }
 }
