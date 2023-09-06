@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Task;
 use App\Form\TaskType;
 use App\Repository\TaskRepository;
+use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -32,27 +33,35 @@ class TaskController extends AbstractController
     /**
      * @Route("/tasks/create", name="task_create")
      */
-    public function createAction(Request $request)
+    public function createAction(Request $request, UserRepository $userRepo)
     {
-        $task = new Task();
-        $form = $this->createForm(TaskType::class, $task);
+        if ($user = $this->getUser()){
 
-        $form->handleRequest($request);
+            $task = new Task();
+            $form = $this->createForm(TaskType::class, $task);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+            $form->handleRequest($request);
             
-            $em = $this->getDoctrine()->getManager();
-            $task->setUser($this->getUser());
+            if ($form->isSubmitted() && $form->isValid()) {
+                
+                $em = $this->getDoctrine()->getManager();
+                $task->setUser($user);
+                $em->persist($task);
+                $em->flush();
 
-            $em->persist($task);
-            $em->flush();
+                $this->addFlash('success', 'La tâche a été bien été ajoutée.');
 
-            $this->addFlash('success', 'La tâche a été bien été ajoutée.');
+                return $this->redirectToRoute('task_list');
+            }
 
-            return $this->redirectToRoute('task_list');
+            return $this->render('task/create.html.twig', ['form' => $form->createView()]);
+            
+        } else {
+
+            header("Location: http://127.0.0.1:8000/");
+            die;
+
         }
-
-        return $this->render('task/create.html.twig', ['form' => $form->createView()]);
     }
 
     /**
@@ -86,6 +95,7 @@ class TaskController extends AbstractController
                 die;
 
             }
+
         } else {
 
             header("location: http://127.0.0.1:8000");
@@ -113,7 +123,7 @@ class TaskController extends AbstractController
     public function deleteTaskAction(Task $task)
     {
 
-        if ($task->getUser() === null){
+        if ($task->getUser()->getId() === 10){
             
             if ($this->isGranted("ROLE_ADMIN")){
 
