@@ -24,7 +24,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/tasks/done", name="done_task_list")
      */
-    public function listDoneAction()
+    public function listDoneAction(TaskRepository $taskRepository)
     {
         return $this->render('task/done.html.twig', ['tasks' => $taskRepository->findByIsDone(true)]);
     }
@@ -39,7 +39,7 @@ class TaskController extends AbstractController
 
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             
             $em = $this->getDoctrine()->getManager();
             $task->setUser($this->getUser());
@@ -60,22 +60,38 @@ class TaskController extends AbstractController
      */
     public function editAction(Task $task, Request $request)
     {
-        $form = $this->createForm(TaskType::class, $task);
+        if ($user = $this->getUser()) {
+            
+            if ($task->getUser() === $user || $this->isGranted('ROLE_ADMIN')){
 
-        $form->handleRequest($request);
+                $form = $this->createForm(TaskType::class, $task);
+                $form->handleRequest($request);
+                
+                if ($form->isSubmitted() && $form->isValid()) {
+                    $this->getDoctrine()->getManager()->flush();
 
-        if ($form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+                    $this->addFlash('success', 'La tâche a bien été modifiée.');
 
-            $this->addFlash('success', 'La tâche a bien été modifiée.');
+                    return $this->redirectToRoute('task_list');
+                }
 
-            return $this->redirectToRoute('task_list');
+                return $this->render('task/edit.html.twig', [
+                    'form' => $form->createView(),
+                    'task' => $task,
+                ]);
+
+            } else {
+
+                header("location: http://127.0.0.1:8000");
+                die;
+
+            }
+        } else {
+
+            header("location: http://127.0.0.1:8000");
+            die;
+
         }
-
-        return $this->render('task/edit.html.twig', [
-            'form' => $form->createView(),
-            'task' => $task,
-        ]);
     }
 
     /**
