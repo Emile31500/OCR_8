@@ -34,11 +34,6 @@ class Authenticator extends AbstractLoginFormAuthenticator
 
         $request->getSession()->set(Security::LAST_USERNAME, $email);
 
-        var_dump(new UserBadge($email));
-        // var_dump(new PasswordCredentials($request->request->get('password', '')));
-        // var_dump(new CsrfTokenBadge('authenticate', $request->get('_csrf_token')));
-        // die;
-
         return new Passport(
             new UserBadge($email),
             new PasswordCredentials($request->request->get('password', '')),
