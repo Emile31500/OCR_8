@@ -55,10 +55,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->username;
     }
 
-    public function setUsername(string $username) :?string
+    public function setUsername(string $username) :?User
     {
         $this->username = $username;
-        return $this->username;
+        return $this;
     }
 
     public function getSalt()
@@ -71,10 +71,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    public function setPassword(string $password)
+    public function setPassword(string $password) :?User
     {
         $this->password = $password;
-
         return $this;
     }
 
@@ -83,10 +82,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
-    public function setEmail(string $email) :?string
+    public function setEmail(string $email) :?User
     {
         $this->email = $email;
-        return $this->email;
+        return $this;
     }
 
     public function eraseCredentials()
@@ -98,7 +97,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->role;
     }
 
-    public function setRoles(array $role)
+    public function setRoles(array $role) :?User
     {
         $this->role = $role;
         return $this;

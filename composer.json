@@ -57,7 +57,7 @@
         "symfony/maker-bundle": "^1.0",
         "symfony/web-server-bundle": "*",
         "phpunit/phpunit": "*",
-        "symfony/phpunit-bridge": "*",
+        "symfony/phpunit-bridge": "^6.3",
         "doctrine/doctrine-fixtures-bundle": "^3.0",
         "symfony/debug-bundle": "5.4.*",
         "symfony/stopwatch": "5.4.*",
@@ -97,7 +97,7 @@
         }
     },
     "config": {
-        "vendor-dir": "/vendor/",
+        "vendor-dir": "C:/wamp/www/OCR_8_-AM-LIOREZ-UNE-APPLICATION-EXISTANTE-DE-TODO-CO/vendor",
         "allow-plugins": {
             "symfony/flex": true,
             "symfony/runtime": true
