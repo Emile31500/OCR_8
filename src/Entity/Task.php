@@ -53,7 +53,7 @@ class Task
         $this->isDone = false;
     }
 
-    public function getId()
+    public function getId() :?int
     {
         return $this->id;
     }
@@ -69,7 +69,7 @@ class Task
         return $this;
     }
 
-    public function getTitle()
+    public function getTitle() :?string
     {
         return $this->title;
     }
@@ -80,7 +80,7 @@ class Task
         return $this;
     }
 
-    public function getContent()
+    public function getContent() :?string
     {
         return $this->content;
     }
@@ -102,13 +102,14 @@ class Task
         return $this;
     }
 
-    public function isDone()
+    public function isDone() :?bool
     {
         return $this->isDone;
     }
 
-    public function toggle($flag)
+    public function toggle($flag) :?Task
     {
         $this->isDone = $flag;
+        return $this;
     }
 }
