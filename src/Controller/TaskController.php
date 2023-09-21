@@ -58,8 +58,10 @@ class TaskController extends AbstractController
             
         } else {
 
-            header("Location: http://127.0.0.1:8000/");
-            die;
+            $url = '/';
+            return $this->redirect($url);
+            // header("Location: http://127.0.0.1:8000/");
+            // die;
 
         }
     }
@@ -123,9 +125,27 @@ class TaskController extends AbstractController
     public function deleteTaskAction(Task $task)
     {
 
-        if ($task->getUser()->getId() === 10){
-            
-            if ($this->isGranted("ROLE_ADMIN")){
+        if ($user = $this->getUser()){
+
+            if($task->getUser() !== null){
+
+                if($user === $task->getUser() || $this->isGranted("ROLE_ADMIN")){
+
+                    $em = $this->getDoctrine()->getManager();
+                    $em->remove($task);
+                    $em->flush();
+
+                    $this->addFlash('success', 'La tâche a bien été supprimée.');
+                    return $this->redirectToRoute('task_list');
+
+                } else {
+
+                    $this->addFlash('notice', 'Cette tâche ne vous appartient pas, vous devez être administrateur pour la supprimer');
+                    return $this->redirectToRoute('task_list');
+
+                }
+
+            } else if ($this->isGranted("ROLE_ADMIN")) {
 
                 $em = $this->getDoctrine()->getManager();
                 $em->remove($task);
@@ -135,26 +155,15 @@ class TaskController extends AbstractController
                 return $this->redirectToRoute('task_list');
 
             } else {
-
+                
                 $this->addFlash('notice', 'Cette tâche est anonyme, vous devez être administrateur pour la supprimer');
                 return $this->redirectToRoute('task_list');
 
             }
 
-        } else if ($task->getUser() == $this->getUser()) {
-            
-            $em = $this->getDoctrine()->getManager();
-            $em->remove($task);
-            $em->flush();
-
-            $this->addFlash('success', 'La tâche a bien été supprimée.');
-            return $this->redirectToRoute('task_list');
-
         } else {
-
-            $this->addFlash('notice', 'Cette tâche ne vous appartient pas, vous devez être administrateur pour la supprimer');
-            return $this->redirectToRoute('task_list');
-
+            $url = '/';
+            return $this->redirect($url);
         }
     }
 }
