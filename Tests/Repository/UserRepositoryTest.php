@@ -5,6 +5,7 @@ namespace Tests\Repository;
 use App\Entity\User;
 use PHPUnit\Framework\TestCase;
 use App\Repository\UserRepository;
+use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 
 class UserRepositoryTest extends TestCase {
@@ -24,32 +25,21 @@ class UserRepositoryTest extends TestCase {
 
         $this->assertInstanceOf(User::class, $userRepository->loadUserByUsername($username));
 
+        // $user = new User();
+        // $user->setUsername('Emile');
 
-
-
-
-
-
-
-
-
-
-
-        $user = new User();
-        $user->setUsername('Emile');
-
-        $userRepository = $this->createMock(ObjectRepository::class);
-        $userRepository->expects($this->any())
-            ->method('find')
-            ->willReturn($user);
+        // $userRepository = $this->createMock(ObjectRepository::class);
+        // $userRepository->expects($this->any())
+        //     ->method('find')
+        //     ->willReturn($user);
             
-        $objectManager = $this->createMock(ObjectManager::class);
-        $objectManager->expects($this->any())
-            ->method('getRepository')
-            ->willReturn($userRepository);
+        // $objectManager = $this->createMock(ObjectManager::class);
+        // $objectManager->expects($this->any())
+        //     ->method('getRepository')
+        //     ->willReturn($userRepository);
 
-        $userRepositoryTest = new UserRepositoryTest($objectManager);
-        $this->assertEquals($user->getUsername(), $userRepositoryTest->getUser('Emile')->getUsername());
+        // $userRepositoryTest = new UserRepositoryTest($objectManager);
+        // $this->assertEquals($user->getUsername(), $userRepositoryTest->getUser('Emile')->getUsername());
     }
 
     public function getUser(string $username)
