@@ -1,6 +1,6 @@
 <?php 
 
-namespace App\Tests\Entity;
+namespace Tests\Entity;
 
 use Datetime;
 use App\Entity\Task;
@@ -22,6 +22,8 @@ class TaskTest extends TestCase
         $this->assertSame($task->setContent($content)->getContent(), $content);
         $this->assertSame($task->setCreatedAt($createdAt)->getCreatedAt(), $createdAt);
         $this->assertSame($task->setUser($user)->getUser(), $user);
+        $this->assertSame($task->toggle(true)->isDone(), true);
+
 
     }
 
@@ -38,6 +40,6 @@ class TaskTest extends TestCase
         $this->assertSame($task->setContent($content), $task);
         $this->assertSame($task->setCreatedAt($createdAt), $task);
         $this->assertSame($task->setUser($user), $task);
-
+        $this->assertSame($task->toggle(true), $task);
     }
 }
