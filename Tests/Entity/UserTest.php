@@ -1,6 +1,6 @@
 <?php 
 
-namespace App\Tests\Entity;
+namespace Tests\Entity;
 
 use App\Entity\User;
 use PHPUnit\Framework\TestCase;
@@ -15,7 +15,6 @@ class UserTest extends TestCase
         $roles = ['ROLE_USER'];
 
         $user = new User();
-
         $this->assertSame($user->setUsername($username)->getUsername(), $username);
         $this->assertSame($user->setEmail($email)->getEmail(), $email);
         $this->assertSame($user->setPassword($password)->getPassword(), $password);
@@ -30,7 +29,6 @@ class UserTest extends TestCase
         $roles = ['ROLE_USER'];
 
         $user = new User();
-        
         $this->assertSame($user->setUsername($username), $user);
         $this->assertSame($user->setEmail($email), $user);
         $this->assertSame($user->setPassword($password), $user);
