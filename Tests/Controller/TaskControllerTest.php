@@ -147,4 +147,20 @@ class TaskControllerTest extends WebTestCase
          $crawler = $client->request('GET', $url);
          $this->assertNull($taksRepository->findOneBy(['id' => $id]));
      }
+
+    public function testToggle() {
+
+        $client = static::createClient();
+        $taksRepository = static::getContainer()->get(TaskRepository::class);
+        $tasks = $taksRepository->findAll();
+        $untoggledTask = $tasks[0];
+        $id = $untoggledTask->getId();
+        
+        $url = '/tasks/'.$id.'/toggle';
+        $crawler = $client->request('GET', $url);
+        $toggledTask = $taksRepository->findOneBy(['id' => $id]);
+
+        $this->assertEquals($untoggledTask->isDone(), !($toggledTask->isDone()));
+
+    }
 }
