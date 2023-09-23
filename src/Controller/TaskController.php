@@ -58,11 +58,7 @@ class TaskController extends AbstractController
             
         } else {
 
-            $url = '/';
-            return $this->redirect($url);
-            // header("Location: http://127.0.0.1:8000/");
-            // die;
-
+            return $this->redirect('/');
         }
     }
 
@@ -93,16 +89,13 @@ class TaskController extends AbstractController
 
             } else {
 
-                header("location: http://127.0.0.1:8000");
-                die;
+                return $this->redirect('/');
 
             }
 
         } else {
-
-            header("location: http://127.0.0.1:8000");
-            die;
-
+            
+            return $this->redirect('/');
         }
     }
 

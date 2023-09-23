@@ -19,6 +19,7 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
+
         $user = new User();
         $user->setUsername("Emile");
         $user->setEmail("emile00013@gmail.com");
@@ -30,6 +31,12 @@ class AppFixtures extends Fixture
         $admin->setEmail("emile00013+1@gmail.com");
         $admin->setPassword($this->hasher->hashPassword($admin, "P@ssw0rd"));
         $admin->setRoles(['ROLE_USER','ROLE_ADMIN']);
+        
+        $userTest = new User();
+        $userTest->setUsername("User Test");
+        $userTest->setEmail("emile00013+2@gmail.com");
+        $userTest->setPassword($this->hasher->hashPassword($userTest, "P@ssw0rd"));
+        $userTest->setRoles(['ROLE_USER']);
 
         $anonymousUser = new User();
         $anonymousUser->setUsername("Anonymous");
@@ -37,35 +44,72 @@ class AppFixtures extends Fixture
         $anonymousUser->setPassword('');
         $anonymousUser->setRoles(['ROLE_ANONYMOUS']);
 
-        $task0 = new Task();
-        $task0->setUser($user);
-        $task0->setTitle('Tache n° 1');
-        $task0->setCreatedAt(new DateTime());
-        $task0->toggle(false);
-        $task0->setContent('Contenu de ma tache 1');
+        for ($i=0; $i < 10; $i++) { 
 
-        $task1 = new Task();
-        $task1->setUser($admin);
-        $task1->setTitle('Tache n° 2');
-        $task1->setCreatedAt(new DateTime());
-        $task1->toggle(false);
-        $task1->setContent('Contenu de ma tache 2');
+            $taskUser[$i] = new Task();
+            $taskUser[$i]->setUser($user);
+            $taskUser[$i]->setTitle('Tache indice '.$i);
+            $taskUser[$i]->setCreatedAt(new DateTime());
+            $taskUser[$i]->toggle(false);
+            $taskUser[$i]->setContent('Contenu de ma tache ');
+            $manager->persist($taskUser[$i]);
 
-        $task2 = new Task();
-        $task2->setUser($anonymousUser);
-        $task2->setTitle('Tache n° 3');
-        $task2->setCreatedAt(new DateTime());
-        $task2->toggle(false);
-        $task2->setContent('Contenu de ma tache 3');
+        }
+
+        for ($i=0; $i < 10; $i++) { 
+
+            $taskTest[$i] = new Task();
+            $taskTest[$i]->setUser($userTest);
+            $taskTest[$i]->setTitle('Tache indice '.$i);
+            $taskTest[$i]->setCreatedAt(new DateTime());
+            $taskTest[$i]->toggle(false);
+            $taskTest[$i]->setContent('Contenu de ma tache ');
+            $manager->persist($taskTest[$i]);
+
+        }
+        
+        for ($i=0; $i < 10; $i++) { 
+
+            $taskAdmin[$i] = new Task();
+            $taskAdmin[$i]->setUser($admin);
+            $taskAdmin[$i]->setTitle('Tache indice '.$i);
+            $taskAdmin[$i]->setCreatedAt(new DateTime());
+            $taskAdmin[$i]->toggle(false);
+            $taskAdmin[$i]->setContent('Contenu de ma tache ');
+            $manager->persist($taskAdmin[$i]);
+
+
+        }
+
+        for ($i=0; $i < 10; $i++) { 
+
+            $taskAnno[$i] = new Task();
+            $taskAnno[$i]->setUser($anonymousUser);
+            $taskAnno[$i]->setTitle('Tache indice '.$i);
+            $taskAnno[$i]->setCreatedAt(new DateTime());
+            $taskAnno[$i]->toggle(false);
+            $taskAnno[$i]->setContent('Contenu de ma tache ');
+            $manager->persist($taskAnno[$i]);
+
+        }
+
+        for ($i=0; $i < 10; $i++) { 
+
+            $taskNullUser[$i] = new Task();
+            $taskNullUser[$i]->setTitle('Tache indice '.$i);
+            $taskNullUser[$i]->setCreatedAt(new DateTime());
+            $taskNullUser[$i]->toggle(false);
+            $taskNullUser[$i]->setContent('Contenu de ma tache ');
+            $manager->persist($taskNullUser[$i]);
+
+        }
 
 
         $manager->persist($user);
         $manager->persist($admin);
         $manager->persist($anonymousUser);
+        $manager->persist($userTest);
 
-        $manager->persist($task0);
-        $manager->persist($task1);
-        $manager->persist($task2);
 
         $manager->flush();
     }

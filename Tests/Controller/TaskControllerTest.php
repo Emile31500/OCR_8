@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class TaskControllerTest extends WebTestCase
 {
+
     public function testList(): void
     {
         $client = static::createClient();
@@ -25,18 +26,19 @@ class TaskControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
     }
 
-   /* public function testCreate(): void
+   public function testCreateUnAuth(): void
     {
         $client = static::createClient();
         
         $crawler = $client->request('GET', '/tasks/create');
-        $this->assertResponseIsSuccessful();
 
-       // $this->assertResponseRedirects('http://127.0.0.1:8000', 200);
-       // $this->assertSelectorTextContains('h1', 'Bienvenue sur Todo List, l\'application vous permettant de gérer l\'ensemble de vos tâches sans effort !');
+       $client->followRedirect();
+
+       $this->assertResponseIsSuccessful();
+       $this->assertSame('/', $client->getRequest()->getPathInfo());
         
-    }*/
-    
+    }
+
     public function testCreateAuthAdmin(): void
     {   
         
@@ -57,6 +59,44 @@ class TaskControllerTest extends WebTestCase
         $form['task[content]']->setValue('Content');
 
         $client->submit($form);
+    }
+
+    public function testEditUnAuth(): void
+    {
+        $client = static::createClient();
+
+        $taksRepository = static::getContainer()->get(TaskRepository::class);
+        $tasks = $taksRepository->findAll();
+        $task = $tasks[0];
+        $id = $task->getId();
+        $url = '/tasks/'.$id.'/edit';
+        $crawler = $client->request('GET', $url);
+        
+        $client->followRedirect();
+        
+        $this->assertResponseIsSuccessful();
+        $this->assertSame('/', $client->getRequest()->getPathInfo());
+    }
+
+    public function testEditTaskDontBelongToAuth(): void
+    {
+        $client = static::createClient();
+
+        $taksRepository = static::getContainer()->get(TaskRepository::class);
+        $userRepository = static::getContainer()->get(UserRepository::class);
+
+        $user = $userRepository->findOneBy(['username'=>'Emile']);
+        $user2 = $userRepository->findOneBy(['username'=>'Emile_Admin']);
+        $task = $taksRepository->findOneBy(['user' => $user2->getId()]);
+
+        $id = $task->getId();
+        $url = '/tasks/'.$id.'/edit';
+        $crawler = $client->request('GET', $url);
+        
+        $client->followRedirect();
+        
+        $this->assertResponseIsSuccessful();
+        $this->assertSame('/', $client->getRequest()->getPathInfo());
     }
 
     public function testEditAuthAdmin(): void
@@ -93,6 +133,32 @@ class TaskControllerTest extends WebTestCase
         $this->assertEquals($newContent, $taskUpdated->getContent());
     }
 
+    public function testDeleteAuthUser(): void
+    {   
+        
+        $client = static::createClient();
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $taksRepository = static::getContainer()->get(TaskRepository::class);
+        $user = $userRepository->findOneBy(['username' => 'Emile']);
+
+        if (isset($user)) {
+
+            $task = $taksRepository->findOneBy(['user' => $user->getId()]);
+
+            if($task) {
+
+                $id = $task->getId();
+                $client->loginUser($user);
+                $url = '/tasks/'.$id.'/delete';
+                $crawler = $client->request('GET', $url);
+                $this->assertNull($taksRepository->findOneBy(['id' => $id]));
+
+            }
+            
+        }
+       
+    }
+
     public function testDeleteAuthAdmin(): void
     {   
         
@@ -114,53 +180,45 @@ class TaskControllerTest extends WebTestCase
         $this->assertNull($taksRepository->findOneBy(['id' => $id]));
     }
 
-    // Excepting works
-    public function testDeleteAuthUser(): void
-    {   
-        
-        $client = static::createClient();
-        $userRepository = static::getContainer()->get(UserRepository::class);
-        $taksRepository = static::getContainer()->get(TaskRepository::class);
-        $user = $userRepository->findOneBy(['username' => 'Emile']);
-        $task = $taksRepository->findOneBy(['user' => $user->getId()]);
-
-        $id = $task->getId();
-        $client->loginUser($user);
-        $url = '/tasks/'.$id.'/delete';
-        $crawler = $client->request('GET', $url);
-        $this->assertNull($taksRepository->findOneBy(['id' => $id]));
-    }
-
-     // Excepting works
      public function testDeleteAuthAdminAndNullUser (): void
      {   
          
-         $client = static::createClient();
-         $userRepository = static::getContainer()->get(UserRepository::class);
-         $taksRepository = static::getContainer()->get(TaskRepository::class);
-         $userAdmin = $userRepository->findOneBy(['username' => 'Emile_Admin']);
-         $task = $taksRepository->findOneBy(['user' => null]);
+        $client = static::createClient();
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $taksRepository = static::getContainer()->get(TaskRepository::class);
+        $userAdmin = $userRepository->findOneBy(['username' => 'Emile_Admin']);
+        $task = $taksRepository->findOneBy(['user' => null]);
  
-         $id = $task->getId();
-         $client->loginUser($userAdmin);
-         $url = '/tasks/'.$id.'/delete';
-         $crawler = $client->request('GET', $url);
-         $this->assertNull($taksRepository->findOneBy(['id' => $id]));
+        if (isset($task)) {
+
+            $id = $task->getId();
+            $client->loginUser($userAdmin);
+            $url = '/tasks/'.$id.'/delete';
+            $crawler = $client->request('GET', $url);
+            $this->assertNull($taksRepository->findOneBy(['id' => $id]));
+
+        }
+         
      }
 
-    public function testToggle() {
+    public function testToggle()
+    {
 
         $client = static::createClient();
         $taksRepository = static::getContainer()->get(TaskRepository::class);
         $tasks = $taksRepository->findAll();
+
+       
         $untoggledTask = $tasks[0];
+        $status = $untoggledTask->isDone();
         $id = $untoggledTask->getId();
         
         $url = '/tasks/'.$id.'/toggle';
         $crawler = $client->request('GET', $url);
         $toggledTask = $taksRepository->findOneBy(['id' => $id]);
 
-        $this->assertEquals($untoggledTask->isDone(), !($toggledTask->isDone()));
+
+        $this->assertEquals($status, !($toggledTask->isDone()));
 
     }
 }

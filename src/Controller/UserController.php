@@ -25,8 +25,8 @@ class UserController extends AbstractController
         
         } else {
 
-            header("location: http://127.0.0.1:8000");
-            die;
+            return $this->redirect('/');
+            
         }
     }
 
@@ -89,20 +89,8 @@ class UserController extends AbstractController
             return $this->render('user/edit.html.twig', ['form' => $form->createView(), 'user' => $user]);
         
         } else {
-
-            header("location: http://127.0.0.1:8000");
-            die;
+  
+            return $this->redirect('/');
         }
-    }
-
-    /**
-     * @Route("/encodepassword", name="encode_password")
-     */
-    public function encodePassword(UserPasswordEncoderInterface $encoder, Request $request): JsonResponse
-    {
-        
-        $encodepassword = $encoder->encodePassword($user, $password);
-
-        new JsonResponse(["encoded_password" => $encodepassword]);
     }
 }

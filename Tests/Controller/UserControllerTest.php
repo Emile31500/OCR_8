@@ -4,21 +4,27 @@ namespace Tests\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use Symfony\Component\String\ByteString;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class UserControllerTest extends WebTestCase {
 
-    public function testIndex() {
+
+class UserControllerTest extends WebTestCase {
+    
+    public function testListUnAuth()
+    {
 
         $client = static::createClient();
         $crawler = $client->request('GET', 'http://127.0.0.1:8000/users');
         
-        // dd($client->getRequest()->getPathInfo());
+        $client->followRedirect();
+        
 
         $this->assertResponseIsSuccessful();
+        $this->assertSame('/', $client->getRequest()->getPathInfo());
     }
 
-    public function testAuthAdminIndex() {
+    public function testListAuthAdmin() {
 
         $client = static::createClient();
         $userRepository = static::getContainer()->get(UserRepository::class);
@@ -28,7 +34,56 @@ class UserControllerTest extends WebTestCase {
         $crawler = $client->request('GET', 'http://127.0.0.1:8000/users');
         $this->assertResponseIsSuccessful();
     }
-    
+
+    public function testEditUnAuth() {
+
+        $client = static::createClient();
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $user = $userRepository->findOneBy(['username' => 'Emile']);
+        $url = 'http://127.0.0.1:8000/users/'.$user->getId().'/edit';
+        $crawler = $client->request('GET', $url);
+        
+        $client->followRedirect();
+        
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSame('/', $client->getRequest()->getPathInfo());
+
+    }
+
+    public function testEditAuthAdmin(): void
+    {   
+        $client = static::createClient();
+
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $admin = $userRepository->findOneBy(['username' => 'Emile_Admin']);
+        $userTest = $userRepository->findOneBy(['username' => 'User Test']);
+
+        $url = '/users/'.$userTest->getId().'/edit';
+        
+        $client->loginUser($admin);
+
+        $crawler = $client->request('GET', $url);
+        $this->assertResponseIsSuccessful();  
+        
+        $form = $crawler->selectButton('Modifier')->form();
+        
+        $random1 = ByteString::fromRandom(8, implode('', range('a', 'z')))->toString();
+        $random2 = ByteString::fromRandom(8, implode('', range('a', 'z')))->toString();
+        $newEmail = $random1.'@'.$random2.'.com';
+
+        $form['user[username]']->setValue('User Test');
+        $form['user[email]']->setValue($newEmail);
+        $form['user[password][first]']->setValue('P@ssw0rd');
+        $form['user[password][second]']->setValue('P@ssw0rd');
+        $client->submit($form);
+
+        $userUpdated = $userRepository->findOneBy(['username' => 'User Test']);
+
+        $this->assertNotEquals($userTest, $userUpdated);
+        $this->assertInstanceOf(User::class, $userUpdated);
+    }
+
     public function testCreate(): void
     {   
         
@@ -46,37 +101,5 @@ class UserControllerTest extends WebTestCase {
 
 
         $client->submit($form);
-    }
-
-    public function testCreateWithAuthAdmin(): void
-    {   
-        
-        $client = static::createClient();
-
-        $userRepository = static::getContainer()->get(UserRepository::class);
-        $admin = $userRepository->findOneBy(['username' => 'Emile_Admin']);
-        $userTest = $userRepository->findOneBy(['username' => 'User Test']);
-
-        $url = '/users/'.$userTest->getId().'/edit';
-        
-        $client->loginUser($admin);
-
-        $crawler = $client->request('GET', $url);
-        $this->assertResponseIsSuccessful();  
-        
-        $form = $crawler->selectButton('Modifier')->form();
-
-        $form['user[username]']->setValue('User Test Updated');
-        $form['user[email]']->setValue('test.updated@test.test ');
-        $form['user[password][first]']->setValue('p@ssw0rd ùpd@t3d');
-        $form['user[password][second]']->setValue('p@ssw0rd ùpd@t3d');
-        $client->submit($form);
-
-        $userUpdated = $userRepository->findOneBy(['username' => 'User Test Updated']);
-
-        $this->assertNotEquals($userTest, $userUpdated);
-        $this->assertInstanceOf(User::class, $userUpdated);
-
-
-    }
+    } 
 }
