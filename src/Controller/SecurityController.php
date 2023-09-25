@@ -23,15 +23,6 @@ class SecurityController extends AbstractController
         if ($this->getUser()) {
             return $this->redirectToRoute('homepage');
         }
-        
-        // $user = $userRepo->loadUserByUsername('Emile2');
-        //
-        // $verif = $hash->isPasswordValid($user, 'mmm');
-        // var_dump($verif);
-        // die;
-        // 
-        // Le mot de passe de Emile2 est bien mmm
-
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
 
