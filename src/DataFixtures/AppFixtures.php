@@ -44,6 +44,11 @@ class AppFixtures extends Fixture
         $anonymousUser->setPassword('');
         $anonymousUser->setRoles(['ROLE_ANONYMOUS']);
 
+        $manager->persist($user);
+        $manager->persist($admin);
+        $manager->persist($anonymousUser);
+        $manager->persist($userTest);
+
         for ($i=0; $i < 10; $i++) { 
 
             $taskUser[$i] = new Task();
@@ -54,10 +59,6 @@ class AppFixtures extends Fixture
             $taskUser[$i]->setContent('Contenu de ma tache ');
             $manager->persist($taskUser[$i]);
 
-        }
-
-        for ($i=0; $i < 10; $i++) { 
-
             $taskTest[$i] = new Task();
             $taskTest[$i]->setUser($userTest);
             $taskTest[$i]->setTitle('Tache indice '.$i);
@@ -65,10 +66,6 @@ class AppFixtures extends Fixture
             $taskTest[$i]->toggle(false);
             $taskTest[$i]->setContent('Contenu de ma tache ');
             $manager->persist($taskTest[$i]);
-
-        }
-        
-        for ($i=0; $i < 10; $i++) { 
 
             $taskAdmin[$i] = new Task();
             $taskAdmin[$i]->setUser($admin);
@@ -78,11 +75,6 @@ class AppFixtures extends Fixture
             $taskAdmin[$i]->setContent('Contenu de ma tache ');
             $manager->persist($taskAdmin[$i]);
 
-
-        }
-
-        for ($i=0; $i < 10; $i++) { 
-
             $taskAnno[$i] = new Task();
             $taskAnno[$i]->setUser($anonymousUser);
             $taskAnno[$i]->setTitle('Tache indice '.$i);
@@ -90,10 +82,6 @@ class AppFixtures extends Fixture
             $taskAnno[$i]->toggle(false);
             $taskAnno[$i]->setContent('Contenu de ma tache ');
             $manager->persist($taskAnno[$i]);
-
-        }
-
-        for ($i=0; $i < 10; $i++) { 
 
             $taskNullUser[$i] = new Task();
             $taskNullUser[$i]->setTitle('Tache indice '.$i);
@@ -103,14 +91,7 @@ class AppFixtures extends Fixture
             $manager->persist($taskNullUser[$i]);
 
         }
-
-
-        $manager->persist($user);
-        $manager->persist($admin);
-        $manager->persist($anonymousUser);
-        $manager->persist($userTest);
-
-
+        
         $manager->flush();
     }
 }

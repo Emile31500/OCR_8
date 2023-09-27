@@ -9,7 +9,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class SecurityControllerTest extends WebTestCase{
 
-    public function testLogout() : void{
+    public function testLogout() : void
+    {
 
         $client = static::createClient();
         $userRepository = static::getContainer()->get(UserRepository::class);
@@ -24,8 +25,34 @@ class SecurityControllerTest extends WebTestCase{
         $this->assertFalse($client->getContainer()->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY'));
         $this->assertSame('/', $client->getRequest()->getPathInfo());
 
+    } 
+
+    public function testLoginAuthUser() : void
+    {
+        $client = static::createClient();
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $user = $userRepository->findOneBy(["username" => 'Emile']);
+        $client->loginUser($user);
+
+        $crawler = $client->request('GET', '/login');
+        $client->followRedirect();
+
+        $this->assertTrue($client->getContainer()->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY'));
+        $this->assertSame('/', $client->getRequest()->getPathInfo());
+
     }
-/*
+
+    public function testLoginUnauthUser() : void
+    {
+        $client = static::createClient();
+
+        $crawler = $client->request('GET', '/login');
+
+        $this->assertFalse($client->getContainer()->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY'));
+        $this->assertSame('/login', $client->getRequest()->getPathInfo());
+
+    }
+
     function unitTestLogout() : void {
 
         $securityController = $this->createStub(SecurityController::class);
@@ -36,7 +63,7 @@ class SecurityControllerTest extends WebTestCase{
 
         $this->assertInstanceOf(RuntimeException::class, $securityController->logoutCheck());
         
-    }*/
+    }
 
 
 }
