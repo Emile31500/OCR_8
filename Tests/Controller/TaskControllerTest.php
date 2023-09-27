@@ -2,6 +2,7 @@
 
 namespace Tests\Controller;
 
+use App\Entity\Task;
 use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,16 +27,16 @@ class TaskControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
     }
 
-   public function testCreateUnAuth(): void
+    public function testCreateUnAuth(): void
     {
         $client = static::createClient();
         
         $crawler = $client->request('GET', '/tasks/create');
 
-       $client->followRedirect();
+        $client->followRedirect();
 
-       $this->assertResponseIsSuccessful();
-       $this->assertSame('/', $client->getRequest()->getPathInfo());
+        $this->assertResponseIsSuccessful();
+        $this->assertSame('/', $client->getRequest()->getPathInfo());
         
     }
 
@@ -131,6 +132,64 @@ class TaskControllerTest extends WebTestCase
 
         $this->assertEquals($newTitle, $taskUpdated->getTitle());
         $this->assertEquals($newContent, $taskUpdated->getContent());
+    }
+
+    public function testDeleteUnauth(): void
+    {
+
+        $client = static::createClient();
+        $taksRepository = static::getContainer()->get(TaskRepository::class);
+        $tasks = $taksRepository->findAll();
+        $task = $tasks[0];
+        $idTask = $task->getId();
+
+        $url = '/tasks/'.$idTask.'/delete';
+        $crawler = $client->request('GET', $url);
+        $client->followRedirect();
+
+        $this->assertInstanceOf(Task::class, $taksRepository->findOneBy(["id" => $idTask]));
+        $this->assertSame('/', $client->getRequest()->getPathInfo());
+    }
+
+    public function testDeleteAnoAuthUser(): void
+    {
+
+        $client = static::createClient();
+        $taksRepository = static::getContainer()->get(TaskRepository::class);
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $user = $userRepository->findOneBy(["username" => 'Emile']);
+        $task = $taksRepository->findOneBy(["user" => null]);
+        $idTask = $task->getId();
+
+        $client->loginUser($user);
+
+        $url = '/tasks/'.$idTask.'/delete';
+        $crawler = $client->request('GET', $url);
+        $client->followRedirect();
+
+        $this->assertInstanceOf(Task::class, $taksRepository->findOneBy(["id" => $idTask]));
+        $this->assertSame('/tasks', $client->getRequest()->getPathInfo());
+
+    }
+
+    public function testDeleteTaskDontBelongToAuth(): void
+    {
+        $client = static::createClient();
+        $taksRepository = static::getContainer()->get(TaskRepository::class);
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $user = $userRepository->findOneBy(["username" => 'Emile']);
+        $user2 = $userRepository->findOneBy(["username" => 'User Test']);
+        $task = $taksRepository->findOneBy(["user" => $user2->getId()]);
+        $idTask = $task->getId();
+
+        $client->loginUser($user);
+
+        $url = '/tasks/'.$idTask.'/delete';
+        $crawler = $client->request('GET', $url);
+        $client->followRedirect();
+
+        $this->assertInstanceOf(Task::class, $taksRepository->findOneBy(["id" => $idTask]));
+        $this->assertSame('/tasks', $client->getRequest()->getPathInfo());
     }
 
     public function testDeleteAuthUser(): void
