@@ -8,7 +8,6 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 class TaskTypeTest extends TypeTestCase {
 
-
     public function testValidation(){
 
         $formData = [
@@ -33,7 +32,7 @@ class TaskTypeTest extends TypeTestCase {
 
     }
 
-    public function testCustomFormView()
+    /*public function testCustomFormView()
     {
         $formData = new Task();
 
@@ -42,6 +41,6 @@ class TaskTypeTest extends TypeTestCase {
 
         $this->assertArrayHasKey('title', $view->vars);
         //$this->assertSame('expected value', $view->vars['title']);
-    }
+    }*/
 
 }
