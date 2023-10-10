@@ -10,7 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class TaskControllerTest extends WebTestCase
 {
-    /*
+    
     public function testList(): void
     {
         $client = static::createClient();
@@ -39,7 +39,7 @@ class TaskControllerTest extends WebTestCase
         $this->assertSame('/', $client->getRequest()->getPathInfo());
         
     }
-*/
+
     public function testCreateAuthAdmin(): void
     {   
         
@@ -63,7 +63,6 @@ class TaskControllerTest extends WebTestCase
 
         $client->submit($form);
     }
-    /*
     public function testEditUnAuth(): void
     {
         $client = static::createClient();
@@ -281,5 +280,5 @@ class TaskControllerTest extends WebTestCase
 
         $this->assertEquals($status, !($toggledTask->isDone()));
 
-    }*/
+    }
 }
