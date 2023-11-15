@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,7 +17,7 @@ class UserController extends AbstractController
     /**
      * @Route("/users", name="user_list")
      */
-    public function list(UserRepository $userRepository)
+    public function list(UserRepository $userRepository): Response
     {
         if ($this->isGranted("ROLE_ADMIN")){
 
@@ -33,7 +34,7 @@ class UserController extends AbstractController
     /**
      * @Route("/users/create", name="user_create")
      */
-    public function create(Request $request, UserPasswordHasherInterface  $hasher)
+    public function create(Request $request, UserPasswordHasherInterface  $hasher): Response
     {
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
@@ -64,7 +65,7 @@ class UserController extends AbstractController
     /**
      * @Route("/users/{id}/edit", name="user_edit")
      */
-    public function edit(User $user, Request $request, UserPasswordHasherInterface $hasher)
+    public function edit(User $user, Request $request, UserPasswordHasherInterface $hasher): Response
     {
         if ($this->isGranted("ROLE_ADMIN")){
 

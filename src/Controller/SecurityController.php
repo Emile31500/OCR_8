@@ -4,6 +4,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,7 +18,7 @@ class SecurityController extends AbstractController
     /**
      * @Route("/login", name="app_login")
      */
-    public function login(AuthenticationUtils $authenticationUtils, UserPasswordHasherInterface $hash, UserRepository $userRepo)
+    public function login(AuthenticationUtils $authenticationUtils, UserPasswordHasherInterface $hash, UserRepository $userRepo): Response
     {
         
         if ($this->getUser()) {
@@ -32,7 +33,7 @@ class SecurityController extends AbstractController
     /**
      * @Route("/login_check", name="login_check")
      */
-    public function loginCheck( ?User $user):Reponse {
+    public function loginCheck(?User $user):Response {
 
     }
 
