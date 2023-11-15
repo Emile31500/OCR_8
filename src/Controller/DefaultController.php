@@ -10,7 +10,7 @@ class DefaultController extends AbstractController
     /**
      * @Route("/", name="homepage")
      */
-    public function indexAction()
+    public function index()
     {
 
         $isAdmin = $this->isGranted("ROLE_ADMIN");

@@ -15,7 +15,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/tasks", name="task_list")
      */
-    public function listAction(TaskRepository $taskRepository)
+    public function list(TaskRepository $taskRepository)
     {
          
         return $this->render('task/list.html.twig', ['tasks' => $taskRepository->findByIsDone(false)]);
@@ -25,7 +25,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/tasks/done", name="done_task_list")
      */
-    public function listDoneAction(TaskRepository $taskRepository)
+    public function listDone(TaskRepository $taskRepository)
     {
         return $this->render('task/done.html.twig', ['tasks' => $taskRepository->findByIsDone(true)]);
     }
@@ -33,7 +33,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/tasks/create", name="task_create")
      */
-    public function createAction(Request $request, UserRepository $userRepo)
+    public function create(Request $request, UserRepository $userRepo)
     {
         if ($user = $this->getUser()){
 
@@ -65,7 +65,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/tasks/{id}/edit", name="task_edit")
      */
-    public function editAction(Task $task, Request $request)
+    public function edit(Task $task, Request $request)
     {
         if ($user = $this->getUser()) {
             
@@ -102,7 +102,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/tasks/{id}/toggle", name="task_toggle")
      */
-    public function toggleTaskAction(Task $task)
+    public function toggleTask(Task $task)
     {
         $task->toggle(!$task->isDone());
         $this->getDoctrine()->getManager()->flush();
@@ -115,7 +115,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/tasks/{id}/delete", name="task_delete")
      */
-    public function deleteTaskAction(Task $task)
+    public function deleteTask(Task $task)
     {
 
         if ($user = $this->getUser()){

@@ -16,7 +16,7 @@ class UserController extends AbstractController
     /**
      * @Route("/users", name="user_list")
      */
-    public function listAction(UserRepository $userRepository)
+    public function list(UserRepository $userRepository)
     {
         if ($this->isGranted("ROLE_ADMIN")){
 
@@ -33,7 +33,7 @@ class UserController extends AbstractController
     /**
      * @Route("/users/create", name="user_create")
      */
-    public function createAction(Request $request, UserPasswordHasherInterface  $hasher)
+    public function create(Request $request, UserPasswordHasherInterface  $hasher)
     {
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
@@ -64,7 +64,7 @@ class UserController extends AbstractController
     /**
      * @Route("/users/{id}/edit", name="user_edit")
      */
-    public function editAction(User $user, Request $request, UserPasswordHasherInterface $hasher)
+    public function edit(User $user, Request $request, UserPasswordHasherInterface $hasher)
     {
         if ($this->isGranted("ROLE_ADMIN")){
 
