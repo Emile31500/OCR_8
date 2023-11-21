@@ -68,36 +68,26 @@ class TaskController extends AbstractController
      */
     public function edit(Task $task, Request $request): Response
     {
-        if ($user = $this->getUser()) {
-            
-            if ($task->getUser() === $user || $this->isGranted('ROLE_ADMIN')){
 
-                $form = $this->createForm(TaskType::class, $task);
-                $form->handleRequest($request);
-                
-                if ($form->isSubmitted() && $form->isValid()) {
-                    $this->getDoctrine()->getManager()->flush();
+        $this->denyAccessUnlessGranted('task_edit', $task);
 
-                    $this->addFlash('success', 'La tâche a bien été modifiée.');
+        $form = $this->createForm(TaskType::class, $task);
+        $form->handleRequest($request);
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->getDoctrine()->getManager()->flush();
 
-                    return $this->redirectToRoute('task_list');
-                }
+            $this->addFlash('success', 'La tâche a bien été modifiée.');
 
-                return $this->render('task/edit.html.twig', [
-                    'form' => $form->createView(),
-                    'task' => $task,
-                ]);
-
-            } else {
-
-                return $this->redirect('/');
-
-            }
-
-        } else {
-            
-            return $this->redirect('/');
+            return $this->redirectToRoute('task_list');
         }
+
+        return $this->render('task/edit.html.twig', [
+            'form' => $form->createView(),
+            'task' => $task,
+        ]);
+
+    
     }
 
     /**
@@ -118,46 +108,14 @@ class TaskController extends AbstractController
      */
     public function deleteTask(Task $task): Response
     {
+        $this->denyAccessUnlessGranted('task_delete', $task);
 
-        if ($user = $this->getUser()){
-
-            if($task->getUser() !== null){
-
-                if($user === $task->getUser() || $this->isGranted("ROLE_ADMIN")){
-
-                    $em = $this->getDoctrine()->getManager();
-                    $em->remove($task);
-                    $em->flush();
-
-                    $this->addFlash('success', 'La tâche a bien été supprimée.');
-                    return $this->redirectToRoute('task_list');
-
-                } else {
-
-                    $this->addFlash('notice', 'Cette tâche ne vous appartient pas, vous devez être administrateur pour la supprimer');
-                    return $this->redirectToRoute('task_list');
-
-                }
-
-            } else if ($this->isGranted("ROLE_ADMIN")) {
-
-                $em = $this->getDoctrine()->getManager();
-                $em->remove($task);
-                $em->flush();
-
-                $this->addFlash('success', 'La tâche a bien été supprimée.');
-                return $this->redirectToRoute('task_list');
-
-            } else {
-                
-                $this->addFlash('notice', 'Cette tâche est anonyme, vous devez être administrateur pour la supprimer');
-                return $this->redirectToRoute('task_list');
-
-            }
-
-        } else {
-            $url = '/';
-            return $this->redirect($url);
-        }
+        
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($task);
+        $em->flush();
+        
+        $this->addFlash('success', 'La tâche a bien été supprimée.');
+        return $this->redirectToRoute('task_list');
     }
 }
