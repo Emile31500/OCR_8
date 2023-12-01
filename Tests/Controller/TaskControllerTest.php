@@ -3,6 +3,7 @@
 namespace Tests\Controller;
 
 use App\Entity\Task;
+use App\Form\TaskType;
 use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -10,7 +11,11 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class TaskControllerTest extends WebTestCase
 {
-    
+    /**
+     * @group expect200
+     * @group list
+     * @group unAuth
+     */
     public function testList(): void
     {
         $client = static::createClient();
@@ -19,6 +24,11 @@ class TaskControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
     }
 
+    /**
+     * @group expect200
+     * @group list
+     * @group unAuth
+     */
     public function testDoneList(): void
     {
         $client = static::createClient();
@@ -27,6 +37,11 @@ class TaskControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
     }
 
+    /**
+     * @group expectRedirection
+     * @group create
+     * @group unAuth
+     */
     public function testCreateUnAuth(): void
     {
         $client = static::createClient();
@@ -37,9 +52,14 @@ class TaskControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertSame('/', $client->getRequest()->getPathInfo());
-        
+    
     }
 
+    /**
+     * @group expect200
+     * @group create
+     * @group authAdmin
+     */
     public function testCreateAuthAdmin(): void
     {   
         
@@ -63,6 +83,13 @@ class TaskControllerTest extends WebTestCase
 
         $client->submit($form);
     }
+
+    /**
+     * @group expectRedirection
+     * @group expect200
+     * @group edit
+     * @group unAuth
+     */
     public function testEditUnAuth(): void
     {
         $client = static::createClient();
@@ -77,9 +104,14 @@ class TaskControllerTest extends WebTestCase
         $client->followRedirect();
         
         $this->assertResponseIsSuccessful();
-        $this->assertSame('/', $client->getRequest()->getPathInfo());
+        $this->assertSame('/login', $client->getRequest()->getPathInfo());
+
     }
 
+    /**
+     * @group expect403
+     * @group edit
+     */
     public function testEditTaskDontBelongToAuth(): void
     {
         $client = static::createClient();
@@ -91,16 +123,21 @@ class TaskControllerTest extends WebTestCase
         $user2 = $userRepository->findOneBy(['username'=>'Emile_Admin']);
         $task = $taksRepository->findOneBy(['user' => $user2->getId()]);
 
+        $client->loginUser($user);
+
         $id = $task->getId();
         $url = '/tasks/'.$id.'/edit';
-        $crawler = $client->request('GET', $url);
         
-        $client->followRedirect();
-        
-        $this->assertResponseIsSuccessful();
-        $this->assertSame('/', $client->getRequest()->getPathInfo());
+        $client->request('GET', $url);
+        $this->assertEquals(403, $client->getResponse()->getStatusCode());
+
     }
 
+    /**
+     * @group expect200
+     * @group edit
+     * @group authAdmin
+    */
     public function testEditAuthAdmin(): void
     {   
         
@@ -118,7 +155,7 @@ class TaskControllerTest extends WebTestCase
         $url = '/tasks/'.$id.'/edit';
 
         $crawler = $client->request('GET', $url);
-        $this->assertResponseIsSuccessful();  
+        $this->assertResponseIsSuccessful(); 
 
         $form = $crawler->selectButton('Modifier')->form();
 
@@ -135,6 +172,11 @@ class TaskControllerTest extends WebTestCase
         $this->assertEquals($newContent, $taskUpdated->getContent());
     }
 
+    /**
+     * @group expectRedirection
+     * @group delete
+     * @group unAuth
+     */
     public function testDeleteUnauth(): void
     {
 
@@ -149,9 +191,14 @@ class TaskControllerTest extends WebTestCase
         $client->followRedirect();
 
         $this->assertInstanceOf(Task::class, $taksRepository->findOneBy(["id" => $idTask]));
-        $this->assertSame('/', $client->getRequest()->getPathInfo());
+        $this->assertSame('/login', $client->getRequest()->getPathInfo());
     }
 
+    /**
+     * @group except403
+     * @group delete
+     * @group authUser
+     */
     public function testDeleteAnoAuthUser(): void
     {
 
@@ -159,20 +206,24 @@ class TaskControllerTest extends WebTestCase
         $taksRepository = static::getContainer()->get(TaskRepository::class);
         $userRepository = static::getContainer()->get(UserRepository::class);
         $user = $userRepository->findOneBy(["username" => 'Emile']);
-        $task = $taksRepository->findOneBy(["user" => null]);
+        $ano = $userRepository->findOneBy(["username" => 'Anonymous']);
+        $task = $taksRepository->findOneBy(["user" => $ano->getId()]);
         $idTask = $task->getId();
 
         $client->loginUser($user);
 
         $url = '/tasks/'.$idTask.'/delete';
-        $crawler = $client->request('GET', $url);
-        $client->followRedirect();
+        $client->request('GET', $url);
 
         $this->assertInstanceOf(Task::class, $taksRepository->findOneBy(["id" => $idTask]));
-        $this->assertSame('/tasks', $client->getRequest()->getPathInfo());
+        $this->assertEquals(403, $client->getResponse()->getStatusCode());
 
     }
 
+    /**
+     * @group expect403
+     * @group delete
+     */
     public function testDeleteTaskDontBelongToAuth(): void
     {
         $client = static::createClient();
@@ -186,13 +237,18 @@ class TaskControllerTest extends WebTestCase
         $client->loginUser($user);
 
         $url = '/tasks/'.$idTask.'/delete';
-        $crawler = $client->request('GET', $url);
-        $client->followRedirect();
+        $client->request('GET', $url);
 
         $this->assertInstanceOf(Task::class, $taksRepository->findOneBy(["id" => $idTask]));
-        $this->assertSame('/tasks', $client->getRequest()->getPathInfo());
+        $this->assertEquals(403, $client->getResponse()->getStatusCode());
+
     }
 
+    /**
+     * @group except404
+     * @group delete
+     * @group authUser
+     */
     public function testDeleteAuthUser(): void
     {   
         
@@ -219,6 +275,11 @@ class TaskControllerTest extends WebTestCase
        
     }
 
+    /**
+     * @group except404
+     * @group delete
+     * @group authAdmin
+     */
     public function testDeleteAuthAdmin(): void
     {   
         
@@ -239,9 +300,14 @@ class TaskControllerTest extends WebTestCase
 
         $this->assertNull($taksRepository->findOneBy(['id' => $id]));
     }
-
-     public function testDeleteAuthAdminAndNullUser (): void
-     {   
+    
+    /**
+     * @group except404
+     * @group delete
+     * @group authAdmin
+     */
+    public function testDeleteAuthAdminAndNullUser (): void
+    {   
          
         $client = static::createClient();
         $userRepository = static::getContainer()->get(UserRepository::class);
@@ -281,4 +347,5 @@ class TaskControllerTest extends WebTestCase
         $this->assertEquals($status, !($toggledTask->isDone()));
 
     }
+
 }

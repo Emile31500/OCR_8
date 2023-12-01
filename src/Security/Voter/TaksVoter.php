@@ -4,8 +4,10 @@ namespace App\Security\Voter;
 
 use App\Entity\Task;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class TaksVoter extends Voter
@@ -24,31 +26,48 @@ class TaksVoter extends Voter
     protected function supports(string $attribute, $task): bool
     {
         
-        return in_array($attribute, [self::EDIT, self::DELETE])
-            && $task instanceof \App\Entity\Taks;
+        return in_array($attribute, [self::EDIT, self::DELETE]) && $task instanceof Task;
     }
 
     protected function voteOnAttribute(string $attribute, $task, TokenInterface $token): bool
     {
+        
         $user = $token->getUser();
         if (!$user instanceof UserInterface) {
-            return false;
+
+            throw new AccessDeniedException('You\'re not allowed to edit this task');
+
         }
 
         switch ($attribute) {
             case self::EDIT:
 
-                return $this->canEdit($user, $task);
-                break;
+                if ($this->canEdit($user, $task) === false){
 
+                    throw new AccessDeniedException('You\'re not allowed to edit this task');
+
+                } else {
+
+                    return true;
+
+                }
             case self::DELETE:
-                return $this->canDelete($user, $task);
+
+                if ($this->canDelete($user, $task) === false){
+
+                    throw new AccessDeniedException('You\'re not allowed to edit this task');
+
+                } else {
+
+                    return true;
+
+                }
                 break;
         }
-
+        
         return false;
     }
-
+    
     public function canEdit(UserInterface $user, Task $task){
 
         if ($this->security->isGranted('ROLE_ADMIN')){
@@ -60,7 +79,9 @@ class TaksVoter extends Voter
             return true;
 
         } else {
+
             return false;
+
         };
 
     }

@@ -22,6 +22,8 @@ class SecurityController extends AbstractController
     {
         
         if ($this->getUser()) {
+
+            $this->addFlash('notice', 'Vous êtes déjà authentifié.');
             return $this->redirectToRoute('homepage');
         }
         $error = $authenticationUtils->getLastAuthenticationError();

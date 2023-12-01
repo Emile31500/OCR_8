@@ -2,12 +2,12 @@
 <html lang="en">
  <head>
   <meta charset="UTF-8">
-  <title>Dashboard for C:\wamp\www\OCR_8_-Am-liorez-une-application-existante-de-ToDo-Co\src\Repository</title>
+  <title>Dashboard for C:\wamp\www\OCR_8_-Am-liorez-une-application-existante-de-ToDo-Co\src\Security\Voter</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="../_css/bootstrap.min.css?v=9.2.29" rel="stylesheet" type="text/css">
-  <link href="../_css/nv.d3.min.css?v=9.2.29" rel="stylesheet" type="text/css">
-  <link href="../_css/style.css?v=9.2.29" rel="stylesheet" type="text/css">
-  <link href="../_css/custom.css" rel="stylesheet" type="text/css">
+  <link href="../../_css/bootstrap.min.css?v=9.2.29" rel="stylesheet" type="text/css">
+  <link href="../../_css/nv.d3.min.css?v=9.2.29" rel="stylesheet" type="text/css">
+  <link href="../../_css/style.css?v=9.2.29" rel="stylesheet" type="text/css">
+  <link href="../../_css/custom.css" rel="stylesheet" type="text/css">
  </head>
  <body>
   <header>
@@ -16,8 +16,9 @@
      <div class="col-md-12">
       <nav aria-label="breadcrumb">
        <ol class="breadcrumb">
-         <li class="breadcrumb-item"><a href="../index.html">C:\wamp\www\OCR_8_-Am-liorez-une-application-existante-de-ToDo-Co\src</a></li>
-         <li class="breadcrumb-item"><a href="index.html">Repository</a></li>
+         <li class="breadcrumb-item"><a href="../../index.html">C:\wamp\www\OCR_8_-Am-liorez-une-application-existante-de-ToDo-Co\src</a></li>
+         <li class="breadcrumb-item"><a href="../index.html">Security</a></li>
+         <li class="breadcrumb-item"><a href="index.html">Voter</a></li>
          <li class="breadcrumb-item active">(Dashboard)</li>
 
        </ol>
@@ -111,6 +112,7 @@
         </tr>
        </thead>
        <tbody>
+       <tr><td><a href="TaksVoter.php.html#71"><abbr title="App\Security\Voter\TaksVoter::canEdit">canEdit</abbr></a></td><td class="text-right">80%</td></tr>
 
        </tbody>
       </table>
@@ -127,6 +129,7 @@
         </tr>
        </thead>
        <tbody>
+       <tr><td><a href="TaksVoter.php.html#71"><abbr title="App\Security\Voter\TaksVoter::canEdit">canEdit</abbr></a></td><td class="text-right">3</td></tr>
 
        </tbody>
       </table>
@@ -140,9 +143,9 @@
     </p>
    </footer>
   </div>
-  <script src="../_js/jquery.min.js?v=9.2.29" type="text/javascript"></script>
-  <script src="../_js/d3.min.js?v=9.2.29" type="text/javascript"></script>
-  <script src="../_js/nv.d3.min.js?v=9.2.29" type="text/javascript"></script>
+  <script src="../../_js/jquery.min.js?v=9.2.29" type="text/javascript"></script>
+  <script src="../../_js/d3.min.js?v=9.2.29" type="text/javascript"></script>
+  <script src="../../_js/nv.d3.min.js?v=9.2.29" type="text/javascript"></script>
   <script type="text/javascript">
 $(document).ready(function() {
   nv.addGraph(function() {
@@ -155,7 +158,7 @@ $(document).ready(function() {
       .yAxis.tickFormat(d3.format('d'));
 
     d3.select('#classCoverageDistribution svg')
-      .datum(getCoverageDistributionData([0,0,0,0,0,0,0,0,0,0,0,2], "Class Coverage"))
+      .datum(getCoverageDistributionData([0,0,0,0,0,0,0,0,0,0,1,0], "Class Coverage"))
       .transition().duration(500).call(chart);
 
     nv.utils.windowResize(chart.update);
@@ -173,7 +176,7 @@ $(document).ready(function() {
       .yAxis.tickFormat(d3.format('d'));
 
     d3.select('#methodCoverageDistribution svg')
-      .datum(getCoverageDistributionData([0,0,0,0,0,0,0,0,0,0,0,4], "Method Coverage"))
+      .datum(getCoverageDistributionData([0,0,0,0,0,0,0,0,0,1,1,3], "Method Coverage"))
       .transition().duration(500).call(chart);
 
     nv.utils.windowResize(chart.update);
@@ -223,7 +226,7 @@ $(document).ready(function() {
     chart.yAxis.axisLabel('Cyclomatic Complexity');
 
     d3.select('#classComplexity svg')
-      .datum(getComplexityData([[100,2,"<a href=\"TaskRepository.php.html#8\">App\\Repository\\TaskRepository<\/a>"],[100,2,"<a href=\"UserRepository.php.html#9\">App\\Repository\\UserRepository<\/a>"]], 'Class Complexity'))
+      .datum(getComplexityData([[91.66666666666666,15,"<a href=\"TaksVoter.php.html#13\">App\\Security\\Voter\\TaksVoter<\/a>"]], 'Class Complexity'))
       .transition()
       .duration(500)
       .call(chart);
@@ -247,7 +250,7 @@ $(document).ready(function() {
     chart.yAxis.axisLabel('Method Complexity');
 
     d3.select('#methodComplexity svg')
-      .datum(getComplexityData([[100,1,"<a href=\"TaskRepository.php.html#10\">App\\Repository\\TaskRepository::__construct<\/a>"],[100,1,"<a href=\"TaskRepository.php.html#15\">App\\Repository\\TaskRepository::findByIsDone<\/a>"],[100,1,"<a href=\"UserRepository.php.html#11\">App\\Repository\\UserRepository::__construct<\/a>"],[100,1,"<a href=\"UserRepository.php.html#16\">App\\Repository\\UserRepository::loadUserByUsername<\/a>"]], 'Method Complexity'))
+      .datum(getComplexityData([[100,1,"<a href=\"TaksVoter.php.html#20\">App\\Security\\Voter\\TaksVoter::__construct<\/a>"],[100,2,"<a href=\"TaksVoter.php.html#26\">App\\Security\\Voter\\TaksVoter::supports<\/a>"],[91.66666666666666,6,"<a href=\"TaksVoter.php.html#32\">App\\Security\\Voter\\TaksVoter::voteOnAttribute<\/a>"],[80,3,"<a href=\"TaksVoter.php.html#71\">App\\Security\\Voter\\TaksVoter::canEdit<\/a>"],[100,3,"<a href=\"TaksVoter.php.html#89\">App\\Security\\Voter\\TaksVoter::canDelete<\/a>"]], 'Method Complexity'))
       .transition()
       .duration(500)
       .call(chart);

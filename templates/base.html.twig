@@ -42,6 +42,8 @@
 
                 {% if app.user %}
                     <a href="{{ path('app_logout') }}" class="pull-right btn btn-danger">Se déconnecter</a>
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="pull-right btn btn-success">Se connecter</a>
                 {% endif %}
 
                 {% if not app.user and 'login' != app.request.attributes.get('_route') %}
@@ -49,8 +51,8 @@
                 {% endif %}
             </div>
 
-            <div class="row">
-                <div class="col-md-12">
+            <div class="my-3 row">
+                <div class=" col-md-12">
                     {% for flash_message in app.session.flashBag.get('success') %}
                         <div class="alert alert-success" role="alert">
                             <strong>Superbe !</strong> {{ flash_message }}
