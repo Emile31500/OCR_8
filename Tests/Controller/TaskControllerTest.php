@@ -325,8 +325,8 @@ class TaskControllerTest extends WebTestCase
 
         }
          
-     }
-
+    }
+    
     public function testToggle()
     {
 

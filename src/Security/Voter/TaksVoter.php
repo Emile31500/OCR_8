@@ -15,6 +15,8 @@ class TaksVoter extends Voter
 
     private const EDIT = 'task_edit';
     private const DELETE = 'task_delete';
+    private const NOT_ALLOWED_MESSAGE = 'Vous n\'êtes pas autorisé à faire cette action';
+
     private $security;
 
     public function __construct(Security $security){
@@ -35,7 +37,7 @@ class TaksVoter extends Voter
         $user = $token->getUser();
         if (!$user instanceof UserInterface) {
 
-            throw new AccessDeniedException('You\'re not allowed to edit this task');
+            throw new AccessDeniedException(self::NOT_ALLOWED_MESSAGE);
 
         }
 
@@ -44,7 +46,7 @@ class TaksVoter extends Voter
 
                 if ($this->canEdit($user, $task) === false){
 
-                    throw new AccessDeniedException('You\'re not allowed to edit this task');
+                    throw new AccessDeniedException(self::NOT_ALLOWED_MESSAGE);
 
                 } else {
 
@@ -55,7 +57,7 @@ class TaksVoter extends Voter
 
                 if ($this->canDelete($user, $task) === false){
 
-                    throw new AccessDeniedException('You\'re not allowed to edit this task');
+                    throw new AccessDeniedException(self::NOT_ALLOWED_MESSAGE);
 
                 } else {
 
