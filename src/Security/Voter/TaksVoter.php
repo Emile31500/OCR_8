@@ -43,19 +43,9 @@ class TaksVoter extends Voter
 
         switch ($attribute) {
             case self::EDIT:
-
-                if ($this->canEdit($user, $task) === false){
-
-                    throw new AccessDeniedException(self::NOT_ALLOWED_MESSAGE);
-
-                } else {
-
-                    return true;
-
-                }
             case self::DELETE:
 
-                if ($this->canDelete($user, $task) === false){
+                if ($this->isUserAuthorized($user, $task) === false){
 
                     throw new AccessDeniedException(self::NOT_ALLOWED_MESSAGE);
 
@@ -70,37 +60,9 @@ class TaksVoter extends Voter
         return false;
     }
     
-    public function canEdit(UserInterface $user, Task $task){
+    public function isUserAuthorized(UserInterface $user, Task $task){
 
-        if ($this->security->isGranted('ROLE_ADMIN')){
-
-            return true;
-
-        } else if ($user === $task->getUser()){
-
-            return true;
-
-        } else {
-
-            return false;
-
-        };
-
-    }
-
-    public function canDelete(UserInterface $user, Task $task){
-
-        if ($this->security->isGranted('ROLE_ADMIN')){
-
-            return true;
-
-        } else if ($user === $task->getUser()){
-
-            return true;
-
-        } else {
-            return false;
-        };
+        return $this->security->isGranted('ROLE_ADMIN') || $user === $task->getUser();
 
     }
 }
