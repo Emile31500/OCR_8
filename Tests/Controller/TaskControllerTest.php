@@ -21,6 +21,7 @@ class TaskControllerTest extends WebTestCase
         $client = static::createClient();
         $crawler = $client->request('GET', '/tasks');
 
+        $this->assertSelectorNotExists('.alert.alert-danger');
         $this->assertResponseIsSuccessful();
     }
 
@@ -34,6 +35,7 @@ class TaskControllerTest extends WebTestCase
         $client = static::createClient();
         $crawler = $client->request('GET', '/tasks/done');
 
+        $this->assertSelectorNotExists('.alert.alert-danger');
         $this->assertResponseIsSuccessful();
     }
 
@@ -51,8 +53,9 @@ class TaskControllerTest extends WebTestCase
         $client->followRedirect();
 
         $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains("h1", "Bienvenue sur Todo List, l'application vous permettant de gérer l'ensemble de vos tâches sans effort !");
         $this->assertSame('/', $client->getRequest()->getPathInfo());
-    
+
     }
 
     /**
@@ -65,10 +68,7 @@ class TaskControllerTest extends WebTestCase
         
         $client = static::createClient();
         $userRepository = static::getContainer()->get(UserRepository::class);
-        //$adminUser = $userRepository->findOneBy(['username' => 'Emile_Admin']);
         $adminUser = $userRepository->loadUserByUsername('Emile_Admin');
-
-
 
         $client->loginUser($adminUser);
         //$client = $this->createAuthenticatedClient();
@@ -103,14 +103,17 @@ class TaskControllerTest extends WebTestCase
         
         $client->followRedirect();
         
+        
         $this->assertResponseIsSuccessful();
         $this->assertSame('/login', $client->getRequest()->getPathInfo());
+        $this->assertSelectorNotExists('.alert.alert-warning');
 
     }
 
     /**
      * @group expect403
      * @group edit
+     * @group authUser
      */
     public function testEditTaskDontBelongToAuth(): void
     {
@@ -135,6 +138,7 @@ class TaskControllerTest extends WebTestCase
 
     /**
      * @group expect200
+     * @group expectRedirection
      * @group edit
      * @group authAdmin
     */
@@ -170,6 +174,13 @@ class TaskControllerTest extends WebTestCase
 
         $this->assertEquals($newTitle, $taskUpdated->getTitle());
         $this->assertEquals($newContent, $taskUpdated->getContent());
+
+        $client->followRedirect();
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSame('/tasks', $client->getRequest()->getPathInfo());
+        $this->assertSelectorTextContains('.alert.alert-success', ' La tâche a bien été modifiée.');
+
     }
 
     /**
@@ -192,10 +203,12 @@ class TaskControllerTest extends WebTestCase
 
         $this->assertInstanceOf(Task::class, $taksRepository->findOneBy(["id" => $idTask]));
         $this->assertSame('/login', $client->getRequest()->getPathInfo());
+        $this->assertSelectorNotExists('.alert.alert-warning');
+
     }
 
     /**
-     * @group except403
+     * @group expect403
      * @group delete
      * @group authUser
      */
@@ -223,6 +236,7 @@ class TaskControllerTest extends WebTestCase
     /**
      * @group expect403
      * @group delete
+     * @group authUser
      */
     public function testDeleteTaskDontBelongToAuth(): void
     {
@@ -245,7 +259,7 @@ class TaskControllerTest extends WebTestCase
     }
 
     /**
-     * @group except404
+     * @group expect200
      * @group delete
      * @group authUser
      */
@@ -268,6 +282,12 @@ class TaskControllerTest extends WebTestCase
                 $url = '/tasks/'.$id.'/delete';
                 $crawler = $client->request('GET', $url);
                 $this->assertNull($taksRepository->findOneBy(['id' => $id]));
+              
+                $client->followRedirect();
+
+                $this->assertResponseIsSuccessful();
+                $this->assertSame('/tasks', $client->getRequest()->getPathInfo());
+                $this->assertSelectorTextContains('.alert.alert-success', ' La tâche a bien été supprimée.');
 
             }
             
@@ -276,7 +296,7 @@ class TaskControllerTest extends WebTestCase
     }
 
     /**
-     * @group except404
+     * @group expect200
      * @group delete
      * @group authAdmin
      */
@@ -299,10 +319,16 @@ class TaskControllerTest extends WebTestCase
         $crawler = $client->request('GET', $url);
 
         $this->assertNull($taksRepository->findOneBy(['id' => $id]));
+
+        $client->followRedirect();
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSame('/tasks', $client->getRequest()->getPathInfo());
+        $this->assertSelectorTextContains('.alert.alert-success', ' La tâche a bien été supprimée.');
     }
     
     /**
-     * @group except404
+     * @group expect404
      * @group delete
      * @group authAdmin
      */
@@ -323,19 +349,29 @@ class TaskControllerTest extends WebTestCase
             $crawler = $client->request('GET', $url);
             $this->assertNull($taksRepository->findOneBy(['id' => $id]));
 
+            $client->followRedirect();
+
+            $this->assertResponseIsSuccessful();
+            $this->assertSame('/tasks', $client->getRequest()->getPathInfo());
+            $this->assertSelectorTextContains('.alert.alert-success', ' La tâche a bien été supprimée.');
+
         }
          
     }
     
-    public function testToggle()
+    /**
+     * @group expect200
+     * @group expectRedirection
+     * @group toggle
+     * @group authUser
+     */
+    public function testToggleUndoneTask()
     {
 
         $client = static::createClient();
         $taksRepository = static::getContainer()->get(TaskRepository::class);
-        $tasks = $taksRepository->findAll();
+        $untoggledTask = $taksRepository->findOneBy(["isDone" => 0]);
 
-       
-        $untoggledTask = $tasks[0];
         $status = $untoggledTask->isDone();
         $id = $untoggledTask->getId();
         
@@ -346,6 +382,45 @@ class TaskControllerTest extends WebTestCase
 
         $this->assertEquals($status, !($toggledTask->isDone()));
 
+        $client->followRedirect();
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSame('/tasks', $client->getRequest()->getPathInfo());
+        $this->assertSelectorTextContains('.alert.alert-success', 'a bien été marquée comme faite.');
+        
+                        
+    }
+
+    /**
+     * @group expect200
+     * @group expectRedirection
+     * @group toggle
+     * @group authUser
+     */
+    public function testToggleDoneTask()
+    {
+
+        $client = static::createClient();
+        $taksRepository = static::getContainer()->get(TaskRepository::class);
+        $untoggledTask = $taksRepository->findOneBy(["isDone" => 1]);
+
+        $status = $untoggledTask->isDone();
+        $id = $untoggledTask->getId();
+        
+        $url = '/tasks/'.$id.'/toggle';
+        $crawler = $client->request('GET', $url);
+        $toggledTask = $taksRepository->findOneBy(['id' => $id]);
+
+
+        $this->assertEquals($status, !($toggledTask->isDone()));
+
+        $client->followRedirect();
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSame('/tasks', $client->getRequest()->getPathInfo());
+        $this->assertSelectorTextContains('.alert.alert-success', ' a bien été marquée comme non faite.');
+        
+                        
     }
 
 }

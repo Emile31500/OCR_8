@@ -23,6 +23,7 @@ class SecurityControllerTest extends WebTestCase{
         $client->followRedirect();
         
         $this->assertFalse($client->getContainer()->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY'));
+        $this->assertSelectorTextContains("h1", "Bienvenue sur Todo List, l'application vous permettant de gérer l'ensemble de vos tâches sans effort !");
         $this->assertSame('/', $client->getRequest()->getPathInfo());
 
     } 
@@ -38,6 +39,7 @@ class SecurityControllerTest extends WebTestCase{
         $client->followRedirect();
 
         $this->assertTrue($client->getContainer()->get('security.authorization_checker')->isGranted('IS_AUTHENTICATED_FULLY'));
+        $this->assertSelectorTextContains("h1", "Bienvenue sur Todo List, l'application vous permettant de gérer l'ensemble de vos tâches sans effort !");
         $this->assertSame('/', $client->getRequest()->getPathInfo());
 
     }

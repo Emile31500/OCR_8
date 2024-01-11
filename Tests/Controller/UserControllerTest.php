@@ -21,6 +21,7 @@ class UserControllerTest extends WebTestCase {
         
 
         $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains("h1", "Bienvenue sur Todo List, l'application vous permettant de gérer l'ensemble de vos tâches sans effort !");
         $this->assertSame('/', $client->getRequest()->getPathInfo());
     }
 
@@ -47,6 +48,7 @@ class UserControllerTest extends WebTestCase {
         
 
         $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains("h1", "Bienvenue sur Todo List, l'application vous permettant de gérer l'ensemble de vos tâches sans effort !");
         $this->assertSame('/', $client->getRequest()->getPathInfo());
 
     }
