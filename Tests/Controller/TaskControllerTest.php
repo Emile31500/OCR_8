@@ -197,8 +197,8 @@ class TaskControllerTest extends WebTestCase
         $task = $tasks[0];
         $idTask = $task->getId();
 
-        $url = '/tasks/'.$idTask.'/delete';
-        $crawler = $client->request('GET', $url);
+        $url = '/tasks/'.$idTask;
+        $crawler = $client->request('DELETE', $url);
         $client->followRedirect();
 
         $this->assertInstanceOf(Task::class, $taksRepository->findOneBy(["id" => $idTask]));
@@ -225,8 +225,8 @@ class TaskControllerTest extends WebTestCase
 
         $client->loginUser($user);
 
-        $url = '/tasks/'.$idTask.'/delete';
-        $client->request('GET', $url);
+        $url = '/tasks/'.$idTask;
+        $client->request('DELETE', $url);
 
         $this->assertInstanceOf(Task::class, $taksRepository->findOneBy(["id" => $idTask]));
         $this->assertEquals(403, $client->getResponse()->getStatusCode());
@@ -250,8 +250,8 @@ class TaskControllerTest extends WebTestCase
 
         $client->loginUser($user);
 
-        $url = '/tasks/'.$idTask.'/delete';
-        $client->request('GET', $url);
+        $url = '/tasks/'.$idTask;
+        $client->request('DELETE', $url);
 
         $this->assertInstanceOf(Task::class, $taksRepository->findOneBy(["id" => $idTask]));
         $this->assertEquals(403, $client->getResponse()->getStatusCode());
@@ -280,7 +280,7 @@ class TaskControllerTest extends WebTestCase
                 $id = $task->getId();
                 $client->loginUser($user);
                 $url = '/tasks/'.$id.'/delete';
-                $crawler = $client->request('GET', $url);
+                $crawler = $client->request('DELTE', $url);
                 $this->assertNull($taksRepository->findOneBy(['id' => $id]));
               
                 $client->followRedirect();
@@ -316,7 +316,7 @@ class TaskControllerTest extends WebTestCase
 
         $url = '/tasks/'.$id.'/delete';
 
-        $crawler = $client->request('GET', $url);
+        $crawler = $client->request('DELETE', $url);
 
         $this->assertNull($taksRepository->findOneBy(['id' => $id]));
 
@@ -346,7 +346,7 @@ class TaskControllerTest extends WebTestCase
             $id = $task->getId();
             $client->loginUser($userAdmin);
             $url = '/tasks/'.$id.'/delete';
-            $crawler = $client->request('GET', $url);
+            $crawler = $client->request('DELETE', $url);
             $this->assertNull($taksRepository->findOneBy(['id' => $id]));
 
             $client->followRedirect();
