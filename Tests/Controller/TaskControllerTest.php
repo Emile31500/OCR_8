@@ -71,7 +71,6 @@ class TaskControllerTest extends WebTestCase
         $adminUser = $userRepository->loadUserByUsername('Emile_Admin');
 
         $client->loginUser($adminUser);
-        //$client = $this->createAuthenticatedClient();
 
         $crawler = $client->request('GET', '/tasks/create');
         $this->assertResponseIsSuccessful();  
@@ -244,7 +243,7 @@ class TaskControllerTest extends WebTestCase
         $taksRepository = static::getContainer()->get(TaskRepository::class);
         $userRepository = static::getContainer()->get(UserRepository::class);
         $user = $userRepository->findOneBy(["username" => 'Emile']);
-        $user2 = $userRepository->findOneBy(["username" => 'User Test']);
+        $user2 = $userRepository->findOneBy(["username" => 'Emile_Admin']);
         $task = $taksRepository->findOneBy(["user" => $user2->getId()]);
         $idTask = $task->getId();
 
@@ -279,15 +278,14 @@ class TaskControllerTest extends WebTestCase
 
                 $id = $task->getId();
                 $client->loginUser($user);
-                $url = '/tasks/'.$id.'/delete';
-                $crawler = $client->request('DELTE', $url);
-                $this->assertNull($taksRepository->findOneBy(['id' => $id]));
-              
-                $client->followRedirect();
+                $url = '/tasks/'.$id;
+                $crawler = $client->request('DELETE', $url);
 
                 $this->assertResponseIsSuccessful();
                 $this->assertSame('/tasks', $client->getRequest()->getPathInfo());
                 $this->assertSelectorTextContains('.alert.alert-success', ' La tâche a bien été supprimée.');
+                $this->assertNull($taksRepository->findOneBy(['id' => $id]));
+
 
             }
             
@@ -314,7 +312,7 @@ class TaskControllerTest extends WebTestCase
 
         $client->loginUser($adminUser);
 
-        $url = '/tasks/'.$id.'/delete';
+        $url = '/tasks/'.$id;
 
         $crawler = $client->request('DELETE', $url);
 
@@ -345,7 +343,7 @@ class TaskControllerTest extends WebTestCase
 
             $id = $task->getId();
             $client->loginUser($userAdmin);
-            $url = '/tasks/'.$id.'/delete';
+            $url = '/tasks/'.$id;
             $crawler = $client->request('DELETE', $url);
             $this->assertNull($taksRepository->findOneBy(['id' => $id]));
 

@@ -10,7 +10,13 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 
 class UserControllerTest extends WebTestCase {
-    
+
+    /**
+     * @group expect200
+     * @group expectRedirect
+     * @group list
+     * @group unAuth
+     */
     public function testListUnAuth()
     {
 
@@ -25,6 +31,11 @@ class UserControllerTest extends WebTestCase {
         $this->assertSame('/', $client->getRequest()->getPathInfo());
     }
 
+    /**
+     * @group expect200
+     * @group list
+     * @group authAdmin
+     */
     public function testListAuthAdmin() {
 
         $client = static::createClient();
@@ -36,6 +47,12 @@ class UserControllerTest extends WebTestCase {
         $this->assertResponseIsSuccessful();
     }
 
+    /**
+     * @group expect200
+     * @group expectRedirect
+     * @group edit
+     * @group unAuth
+     */
     public function testEditUnAuth() {
 
         $client = static::createClient();
@@ -53,6 +70,11 @@ class UserControllerTest extends WebTestCase {
 
     }
 
+    /**
+     * @group expect200
+     * @group edit
+     * @group authAdmin
+     */
     public function testEditAuthAdmin(): void
     {   
         $client = static::createClient();
@@ -86,22 +108,81 @@ class UserControllerTest extends WebTestCase {
         $this->assertInstanceOf(User::class, $userUpdated);
     }
 
-    public function testCreate(): void
+     /**
+     * @group expect302
+     * @group create
+     * @group unAuth
+     */
+    public function testCreateUnAuth(): void
     {   
-        
+       
         $client = static::createClient();
 
         $crawler = $client->request('GET', '/users/create');
-        $this->assertResponseIsSuccessful();  
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
+
+        $client->followRedirect();
+
+        $this->assertSame('/login', $client->getRequest()->getPathInfo());
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertSelectorExists('#inputEmail');
+        $this->assertSelectorExists('#password');
+
+
+    } 
+
+    /**
+     * @group expect403
+     * @group create
+     * @group authUser
+     */
+    public function testCreateAuthUser(): void
+    {   
+        
+        $client = static::createClient();
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $user = $userRepository->findOneBy(['username' => 'Emile']);
+        $client->loginUser($user);
+
+        $crawler = $client->request('GET', '/users/create');
+        $this->assertEquals(403, $client->getResponse()->getStatusCode());
+
+    }
+
+    /**
+     * @group expect200
+     * @group create
+     * @group authAdmin
+     */
+    public function testCreateAuthAdmin(): void
+    {   
+        
+        $client = static::createClient();
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $user = $userRepository->findOneBy(['username' => 'Emile_Admin']);
+        $client->loginUser($user);
+
+        $crawler = $client->request('GET', '/users/create');
+
 
         $form = $crawler->selectButton('Ajouter')->form();
 
-        $form['user[username]']->setValue('User Test');
-        $form['user[email]']->setValue('test@test.test');
+        $userName = 'User created '.ByteString::fromRandom(8, implode('', range('a', 'z')))->toString();
+        $random1 = ByteString::fromRandom(8, implode('', range('a', 'z')))->toString();
+        $random2 = ByteString::fromRandom(8, implode('', range('a', 'z')))->toString();
+        $newEmail = $random1.'@'.$random2.'.com';
+
+        $form['user[username]']->setValue($userName);
+        $form['user[email]']->setValue($newEmail);
         $form['user[password][first]']->setValue('T3$tp@ssw0rd');
         $form['user[password][second]']->setValue('T3$tp@ssw0rd');
 
 
         $client->submit($form);
+
+        $userCreated = $user = $userRepository->findOneBy(['username' => $userName]);
+        $this->assertInstanceOf(User::class, $userCreated);
+
+
     } 
 }

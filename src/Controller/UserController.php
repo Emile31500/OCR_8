@@ -36,6 +36,9 @@ class UserController extends AbstractController
      */
     public function create(Request $request, UserPasswordHasherInterface  $hasher): Response
     {
+
+        $this->denyAccessUnlessGranted('user_create');
+
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
 
