@@ -272,7 +272,7 @@ class TaskControllerTest extends WebTestCase
 
         if (isset($user)) {
 
-            $task = $taksRepository->findOneBy(['user' => $user->getId()]);
+            $task = $taksRepository->findOneBy(['user' => $user->getId(), 'isDone' => 0]);
 
             if($task) {
 
@@ -280,7 +280,7 @@ class TaskControllerTest extends WebTestCase
                 $client->loginUser($user);
                 $url = '/tasks/'.$id;
                 $crawler = $client->request('DELETE', $url);
-
+                $client->followRedirect();
                 $this->assertResponseIsSuccessful();
                 $this->assertSame('/tasks', $client->getRequest()->getPathInfo());
                 $this->assertSelectorTextContains('.alert.alert-success', ' La tâche a bien été supprimée.');
@@ -305,8 +305,7 @@ class TaskControllerTest extends WebTestCase
         $userRepository = static::getContainer()->get(UserRepository::class);
         $taksRepository = static::getContainer()->get(TaskRepository::class);
         $adminUser = $userRepository->findOneBy(['username' => 'Emile_Admin']);
-        $tasks = $taksRepository->findAll();
-        $task = $tasks[0];
+        $task = $taksRepository->findOneBy(['isDone' => 1]);
         $id = $task->getId();
 
 
@@ -321,7 +320,7 @@ class TaskControllerTest extends WebTestCase
         $client->followRedirect();
 
         $this->assertResponseIsSuccessful();
-        $this->assertSame('/tasks', $client->getRequest()->getPathInfo());
+        $this->assertSame('/tasks/done', $client->getRequest()->getPathInfo());
         $this->assertSelectorTextContains('.alert.alert-success', ' La tâche a bien été supprimée.');
     }
     
@@ -337,7 +336,8 @@ class TaskControllerTest extends WebTestCase
         $userRepository = static::getContainer()->get(UserRepository::class);
         $taksRepository = static::getContainer()->get(TaskRepository::class);
         $userAdmin = $userRepository->findOneBy(['username' => 'Emile_Admin']);
-        $task = $taksRepository->findOneBy(['user' => null]);
+        $ano = $userRepository->findOneBy(['username' => 'Anonymous']);
+        $task = $taksRepository->findOneBy(['user' => $ano->getId()]);
  
         if (isset($task)) {
 
