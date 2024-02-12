@@ -47,30 +47,30 @@ class AppFixtures extends Fixture
         $test_user->setPassword($this->hasher->hashPassword($test_user, 'P@ssw0rd'));
         $manager->persist($test_user);
 
-        for($i = 1; $i < 20; $i++){
+        for($i = 1; $i < 32; $i++){
 
             $tasks[$i] = new Task();
             $tasks[$i]->setTitle('Tâche '.$i);
 
-            if ($i < 6 ) {
+            if ($i < 9 ) {
 
                 $user = $emile;
-                $content = 'Tâche indice '.$i.'. Appartient à'.$emile->getUsername();
+                $content = 'Tâche indice '.$i.'. Appartient à '.$emile->getUsername();
 
-            } else if ($i < 11) {
+            } else if ($i < 17) {
 
                 $user = $emile_admin;
-                $content = 'Tâche indice '.$i.'. Appartient à'.$emile_admin->getUsername();
+                $content = 'Tâche indice '.$i.'. Appartient à '.$emile_admin->getUsername();
 
-            } else if ($i < 16) {
+            } else if ($i < 25) {
 
                 $user = $ano;
-                $content = 'Tâche indice '.$i.'. Appartient à'.$ano->getUsername();
+                $content = 'Tâche indice '.$i.'. Appartient à '.$ano->getUsername();
 
             } else {
                 
                 $user = $test_user;
-                $content = 'Tâche indice '.$i.'. Appartient à'.$test_user->getUsername();
+                $content = 'Tâche indice '.$i.'. Appartient à '.$test_user->getUsername();
                 
             }
 

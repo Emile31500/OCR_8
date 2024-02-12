@@ -95,6 +95,17 @@ class TaskController extends AbstractController
      */
     public function toggleTask(Task $task): Response
     {
+
+        if ($task->isDone()) {
+
+            $route = 'done_task_list';
+
+        } else {
+
+            $route = 'task_list';
+            
+        }
+
         $newStatus = !$task->isDone();
         $task->toggle($newStatus);
         $this->getDoctrine()->getManager()->flush();
@@ -109,7 +120,7 @@ class TaskController extends AbstractController
 
         }
 
-        return $this->redirectToRoute('task_list');
+        return $this->redirectToRoute($route);
     }
 
     /**

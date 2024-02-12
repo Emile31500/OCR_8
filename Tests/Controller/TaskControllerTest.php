@@ -343,6 +343,13 @@ class TaskControllerTest extends WebTestCase
 
             $id = $task->getId();
             $client->loginUser($userAdmin);
+            
+            $expectUrl = '/tasks';
+            if ($task->isDone()){
+
+                $expectUrl = $expectUrl.'/done';
+            }
+            
             $url = '/tasks/'.$id;
             $crawler = $client->request('DELETE', $url);
             $this->assertNull($taksRepository->findOneBy(['id' => $id]));
@@ -350,7 +357,7 @@ class TaskControllerTest extends WebTestCase
             $client->followRedirect();
 
             $this->assertResponseIsSuccessful();
-            $this->assertSame('/tasks', $client->getRequest()->getPathInfo());
+            $this->assertSame($expectUrl, $client->getRequest()->getPathInfo());
             $this->assertSelectorTextContains('.alert.alert-success', ' La tâche a bien été supprimée.');
 
         }
@@ -415,7 +422,7 @@ class TaskControllerTest extends WebTestCase
         $client->followRedirect();
 
         $this->assertResponseIsSuccessful();
-        $this->assertSame('/tasks', $client->getRequest()->getPathInfo());
+        $this->assertSame('/tasks/done', $client->getRequest()->getPathInfo());
         $this->assertSelectorTextContains('.alert.alert-success', ' a bien été marquée comme non faite.');
         
                         
