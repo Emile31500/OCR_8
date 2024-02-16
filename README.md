@@ -98,4 +98,18 @@ $ php bin/console doctrine:schema:update --force```
 $ php bin/console doctrine:fixtures:load
 ```
 
+### Test part
 
+you'll find all the test at 127.0.0.1:8000/tests/index..html
+
+To start test exec the command
+
+```
+$ vendor/bin/phpunit Test/
+```
+
+To start test and generate html coverage exec the command
+
+```
+$ vendor/bin/phpunit Test/ --coverage-html public/tests/
+```
